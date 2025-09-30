@@ -43,4 +43,4 @@ Este projeto utiliza Docker Compose para orquestrar um ambiente de desenvolvimen
 
 A imagem Docker utilizada neste projeto está disponível publicamente no Docker Hub:
 
-**[https://hub.docker.com/r/tatavitto/aula6-jovander](https://hub.docker.com/r/tatavitto/aula6-jovander)**
+
