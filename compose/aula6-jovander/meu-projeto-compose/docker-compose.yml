@@ -1,0 +1,50 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  # Serviço 1: O Banco de Dados MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: clientesdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      # Volume para persistir os dados do banco
+      - db-data:/var/lib/mysql
+      # Volume para carregar o script de inicialização
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # Serviço 2: A Aplicação com Apache e PHP
+  app:
+    build: ./php  # Diz ao Compose para construir a imagem a partir da pasta ./php
+    container_name: php_app
+    restart: unless-stopped
+    ports:
+      - "80:80"  # Expõe a aplicação na porta 80 do seu PC
+    volumes:
+      # Sincroniza a pasta do código-fonte com a pasta dentro do contêiner
+      - ./php:/var/www/html
+    depends_on:
+      - db  # Garante que o serviço 'db' inicie antes do serviço 'app'
+
+  # Serviço 3: O Gerenciador de Banco de Dados phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    restart: unless-stopped
+    ports:
+      - "8081:80"  # Expõe o phpMyAdmin na porta 8080 do seu PC
+    environment:
+      PMA_HOST: db  # Informa ao phpMyAdmin onde encontrar o banco (o serviço 'db')
+      PMA_PORT: 3306
+    depends_on:
+      - db  # Garante que o serviço 'db' inicie antes do phpMyAdmin
+
+# Define o volume nomeado que será usado pelo serviço 'db'
+volumes:
+  db-data:
